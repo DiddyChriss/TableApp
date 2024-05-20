@@ -1,0 +1,41 @@
+version: '3'
+services:
+
+  tablebuilderdb:
+    image: postgres
+    environment:
+      - POSTGRES_DB=${BACKEND_POSTGRES_NAME}
+      - POSTGRES_USER=${BACKEND_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${BACKEND_POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  tablebuilderbackend:
+    image: tablebuild:latest
+    container_name: tablebuilderbackend
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    links:
+      - tablebuilderdb
+    volumes:
+      - ./:/usr/src/tablebuilder
+      - ./static/:/usr/src/tablebuilder/static
+      - ./static/:/usr/src/tablebuilder/staticfiles
+    command: >
+      sh -c "python3 manage.py migrate &&
+             chmod +x ./scripts/create_superuser.sh &&
+             /bin/sh -c './scripts/create_superuser.sh' &&
+             python3 manage.py runserver 0.0.0.0:8000"
+    stdin_open: true
+    tty: true
+    depends_on:
+      - tablebuilderdb
+
+volumes:
+  postgres_data:
+

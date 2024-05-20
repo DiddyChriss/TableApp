@@ -1,0 +1,1 @@
+echo "from django.contrib.auth.models import User; (user := User.objects.create_superuser('$SUPERUSER_USERNAME','$SUPERUSER_EMAIL','$SUPERUSER_PASSWORD') if not User.objects.filter(username='$SUPERUSER_USERNAME') else None); (user.save() if user else None)" | python3 manage.py shell
