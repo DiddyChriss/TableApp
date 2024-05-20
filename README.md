@@ -22,7 +22,7 @@ Simple app for generating dynamic Table.
 
 ### Linux 
 
-First you need to clone`git clone git@gitlab.com:zero-deposit/....git`
+First you need to clone`git@github.com:DiddyChriss/TableApp.git`
 
 Follow the instructions below:
 
