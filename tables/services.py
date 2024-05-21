@@ -10,13 +10,16 @@ class DynamicTableService:
 
     @staticmethod
     def _get_field_instance(field_type):
-        if field_type == "string":
-            return models.CharField(max_length=255, null=True)
-        elif field_type == "number":
-            return models.IntegerField(null=True)
-        elif field_type == "boolean":
-            return models.BooleanField(default=True)
-        else:
+
+        field_type_map = {
+            'string': models.CharField(max_length=255, null=True),
+            'number': models.IntegerField(null=True),
+            'boolean': models.BooleanField(default=True),
+        }
+
+        try:
+            return field_type_map[field_type]
+        except KeyError:
             raise ValueError(f"Unsupported field type {field_type}")
 
     @staticmethod
@@ -28,10 +31,7 @@ class DynamicTableService:
         }
 
         for field_name, field_type in schema.items():
-            try:
-                attributes[field_name] = DynamicTableService._get_field_instance(field_type)
-            except KeyError:
-                raise ValueError(f"Unsupported field type {field_type}")
+            attributes[field_name] = DynamicTableService._get_field_instance(field_type)
 
         model = type(table_name, (models.Model,), attributes)
 

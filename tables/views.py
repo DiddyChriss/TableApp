@@ -16,20 +16,25 @@ class TableAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request: Request) -> Response:
-        name = request.data.get("name")
-        schema = request.data.get("fields")
+        try:
+            name = request.data.get("name")
+            schema = request.data.get("fields")
 
-        DynamicTableService.create_or_update_model(name, schema)
+            DynamicTableService.create_or_update_model(name, schema)
 
-        return Response({"message": "Table has been created"}, status=status.HTTP_201_CREATED)
+            return Response({"message": "Table has been created"}, status=status.HTTP_201_CREATED)
+        except ValueError as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request: Request, id: int) -> Response:
-        name = request.data.get("name")
-        schema = request.data.get("fields")
+        try:
+            name = request.data.get("name")
+            schema = request.data.get("fields")
 
-        DynamicTableService.create_or_update_model(name, schema, id)
-
-        return Response({"message": "Table updated successfully"}, status=status.HTTP_200_OK)
+            DynamicTableService.create_or_update_model(name, schema, id)
+            return Response({"message": "Table updated successfully"}, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TableRowAPIView(APIView):
@@ -50,7 +55,7 @@ class TableRowAPIView(APIView):
     def get(self, request: Request, id: int) -> Response:
         try:
             dynamic_table = DynamicTable.objects.get(id=id)
-            model = apps.get_model('tables', dynamic_table.name)
+            model = apps.get_model("tables", dynamic_table.name)
             instances = model.objects.all()
             serializer = get_dynamic_serializer(model)(instances, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
